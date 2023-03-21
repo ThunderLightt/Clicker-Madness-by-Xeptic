@@ -1,0 +1,334 @@
+getgenv().autoTap = false;
+getgenv().autoRebirth = false;
+getgenv().buyEgg = false;
+
+local remotePath = game:GetService("ReplicatedStorage").Aero.AeroRemoteServices
+
+local clickMod = require(game:GetService("Players").LocalPlayer.PlayerScripts.Aero.Controllers.UI.Click)
+
+
+
+function unlockGamepasses()
+    local gamepassMod = require(game:GetService("ReplicatedStorage").Aero.Shared.Gamepasses)
+    gamepassMod.HasPassOtherwisePrompt = function() return true end
+end 
+
+function doTap()
+    spawn(function()
+        while autoTap == true do
+            clickMod:Click()
+            wait()
+        end
+    end)
+end
+
+function autoRebirth(rebirthAmount)
+    spawn(function()
+        while getgenv().autoRebirth == true do
+            remotePath.RebirthService.BuyRebirths:FireServer(rebirthAmount)
+            wait()
+        end
+    end)    
+end
+
+function buyEgg(eggType)
+    spawn(function()
+        while wait() do
+            if not getgenv().buyEgg then break end;
+            remotePath.EggService.Purchase:FireServer(eggType)
+        end
+    end)
+end
+
+function getCurrentPlayerPOS()
+    local plyr = game.Players.LocalPlayer;
+    if plyr.Character then
+        return plyr.Character.HumanoidRootPart.Position;
+    end
+    return false;
+end
+
+function teleportTO(placeCFrame)
+    local plyr = game.Players.LocalPlayer;
+    if plyr.Character then
+        plyr.Character.HumanoidRootPart.CFrame = placeCFrame;
+    end
+end
+function teleportWorld(world)
+    if game:GetService("Workspace").Worlds:FindFirstChild(world) then
+        teleportTO(game:GetService("Workspace").Worlds[world].Teleport.CFrame)
+    end
+end
+
+local DiscordLib =
+    loadstring(game:HttpGet "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/discord")()
+
+local win = DiscordLib:Window("Eclipse Hub - Clicker Madness")
+
+local serv = win:Server("Main", "")
+local serve = win:Server("Credits", "")
+
+local a = serv:Channel("Farming")
+
+a:Toggle(
+    "Auto Tap",
+    false,
+    function(bool)
+        getgenv().autoTap = bool
+        print('auto Tap is ', bool)
+        if bool then
+            doTap()
+        end
+    end)
+
+a:Toggle(
+    "Ultra Fast Auto Tap (TESTING)",
+    false,
+    function(bool)
+        getgenv().autoTap = bool
+        print('auto Tap is ', bool)
+        if bool then
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+            doTap()
+        end
+    end)
+
+local selectedRebirth;
+local drop =
+    a:Dropdown(
+    "Rebirth Amount",
+    {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000},
+    function(value)
+        selectedRebirth = value;
+    end
+)
+a:Toggle(
+    "Auto Rebirth",
+    false,
+    function(bool)
+        getgenv().autoRebirth = bool
+        print('auto Rebirth is ', bool);
+        if bool and selectedRebirth then
+            autoRebirth(selectedRebirth);
+        end
+    end)
+
+local b = serv:Channel("Pet")
+
+local selectedEgg
+local drop =
+    b:Dropdown(
+    "Egg Type",
+    {"basic", "lava", "desert", "ocean", "winter", "toxic", "candy", "forest", "storm", "blocks", "space", "dominus", "infinity", "future", "city", "moon", "fire"},
+    function(bigEgg)
+        selectedEgg = bigEgg;
+    end
+)
+
+b:Toggle(
+    "Auto Buy Selected",
+    false,
+    function(bool)
+        getgenv().buyEgg = bool
+        if bool then
+            buyEgg(selectedEgg);
+        end
+    end)
+
+    local mod = require(game:GetService("Players").LocalPlayer.PlayerScripts.Aero.Controllers.UI.Pets)
+
+    for i,v in pairs(getupvalues(mod.CalculatePetCapacity)) do
+        print(i,v);
+    end
+    for i,v in pairs(getconstants(mod.CalculatePetCapacity)) do
+        print(i,v);
+    end
+    setconstant(mod.CalculatePetCapacity, 7, 999999999999999)
+b:Button(
+    "Inf Pet Storage",
+    function()
+        
+        DiscordLib:Notification("Notification", "Inf Pet Storage Executed", "Okay!")
+    end)
+
+local c = serv:Channel("Teleport")
+
+local selectedWorld;
+local drop =
+    c:Dropdown(
+    "Teleport",
+    {"Lava", "Desert", "Ocean", "Winter", "Toxic", "Candy", "Forest", "Storm", "Blocks", "Space", "Dominus", "Infinity", "Future", "City", "Moon", "Fire"},
+    function(value)
+        selectedWorld = value;
+    end
+)
+c:Button(
+    "Teleport",
+    function()
+        if selectedWorld then
+            teleportWorld(selectedWorld)
+        end
+        DiscordLib:Notification("Notification", "Teleported Successfully", "Okay!")
+end)
+
+local d = serv:Channel("Other")
+
+local gamepassMod = require(game:GetService("ReplicatedStorage").Aero.Shared.Gamepasses)
+d:Button(
+    "Claim All Gamepasses (some might not work!)",
+    function()
+        unlockGamepasses()
+        DiscordLib:Notification("Notification", "Claimed All Gamepasses", "Okay!")
+end)
+
+local sldr =
+    d:Slider(
+    "WalkSpeed",
+    0,
+    400,
+    16,
+    function(Nummmerlo)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Nummmerlo
+    end
+)
+
+local sldrt =
+    d:Slider(
+    "JumpPower",
+    0,
+    400,
+    16,
+    function(valued)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = valued
+    end
+)
+
+local abc = serve:Channel("Credits")
+
+abc:Label("              Credits")
+abc:Label("Library: Discord Library")
+abc:Label("Owner: Xeptic#0001")
+
+-- local sldrs = serv:Channel("Sliders")
+
+-- local sldr =
+--     sldrs:Slider(
+--     "Slide me!",
+--     0,
+--     1000,
+--     400,
+--     function(t)
+--         print(t)
+--     end
+-- )
+
+-- sldrs:Button(
+--     "Change to 50",
+--     function()
+--         sldr:Change(50)
+--     end
+-- )
+
+-- local drops = serv:Channel("Dropdowns")
+
+-- local drop =
+--     drops:Dropdown(
+--     "Pick me!",
+--     {"Option 1", "Option 2", "Option 3", "Option 4", "Option 5"},
+--     function(bool)
+--         print(bool)
+--     end
+-- )
+
+-- drops:Button(
+--     "Clear",
+--     function()
+--         drop:Clear()
+--     end
+-- )
+
+-- drops:Button(
+--     "Add option",
+--     function()
+--         drop:Add("Option")
+--     end
+-- )
+
+-- local clrs = serv:Channel("Colorpickers")
+
+-- clrs:Colorpicker(
+--     "ESP Color",
+--     Color3.fromRGB(255, 1, 1),
+--     function(t)
+--         print(t)
+--     end
+-- )
+
+-- local textbs = serv:Channel("Textboxes")
+
+-- textbs:Textbox(
+--     "Gun power",
+--     "Type here!",
+--     true,
+--     function(t)
+--         print(t)
+--     end
+-- )
+
+-- local lbls = serv:Channel("Labels")
+
+-- lbls:Label("This is just a label.")
+
+-- local bnds = serv:Channel("Binds")
+
+-- bnds:Bind(
+--     "Kill bind",
+--     Enum.KeyCode.RightShift,
+--     function()
+--         print("Killed everyone!")
+--     end
+-- )
+
+-- serv:Channel("by dawid#7205")
+
+-- win:Server("Main", "http://www.roblox.com/asset/?id=6031075938")
